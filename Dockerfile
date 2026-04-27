@@ -1,11 +1,16 @@
-FROM maven:3.8.5-openjdk-17 AS build
+# 1. Беремо Maven з Java 25 для збірки
+FROM maven:3-eclipse-temurin-25 AS build
 WORKDIR /app
 COPY . .
-
+# Збираємо проект
 RUN mvn clean package -DskipTests
 
-FROM openjdk:17.0.1-jdk-slim
+# 2. Беремо чисту Java 25 для запуску
+FROM eclipse-temurin:25-jre
 WORKDIR /app
+# Копіюємо готовий файл з попереднього кроку
 COPY --from=build /app/target/*.jar app.jar
+# Відкриваємо порт
 EXPOSE 8080
+# Запускаємо локомотив!
 ENTRYPOINT ["java","-jar","app.jar"]
